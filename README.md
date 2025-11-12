@@ -41,41 +41,38 @@ Aplikasi ini menggunakan **Provider** sebagai state management utama, serta memi
 
 Seluruh kode program utama terdapat di dalam folder `lib/`:
 
+```bash
 lib/
 ├── main.dart
-│ └── Titik masuk aplikasi + MultiProvider
+│   └── Titik masuk aplikasi + MultiProvider
 │
 ├── models/
-│ ├── user_model.dart
-│ ├── tweet_model.dart
-│ └── notification_model.dart
+│   ├── user_model.dart
+│   ├── tweet_model.dart
+│   └── notification_model.dart
 │
 ├── providers/
-│ ├── auth_provider.dart
-│ ├── tweet_provider.dart
-│ └── theme_provider.dart
+│   ├── auth_provider.dart
+│   ├── tweet_provider.dart
+│   └── theme_provider.dart
 │
 ├── screens/
-│ ├── auth_screen.dart
-│ ├── home_screen.dart
-│ ├── compose_tweet_screen.dart
-│ ├── profile_screen.dart
-│ ├── search_screen.dart
-│ ├── messages_screen.dart
-│ ├── notifications_screen.dart
-│ └── tweet_detail_screen.dart
+│   ├── auth_screen.dart
+│   ├── home_screen.dart
+│   ├── compose_tweet_screen.dart
+│   ├── profile_screen.dart
+│   ├── search_screen.dart
+│   ├── messages_screen.dart
+│   ├── notifications_screen.dart
+│   └── tweet_detail_screen.dart
 │
 └── widgets/
-├── custom_button.dart
-├── custom_tab_bar.dart
-├── tweet_card.dart
-├── user_avatar.dart
-└── input_field.dart
+    ├── custom_button.dart
+    ├── custom_tab_bar.dart
+    ├── tweet_card.dart
+    ├── user_avatar.dart
+    └── input_field.dart
 
-yaml
-Salin kode
-
----
 
 ## 🖥️ Tampilan UI (Konsep)
 
