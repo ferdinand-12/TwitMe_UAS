@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
             primaryColor: const Color(0xFF1DA1F2),
             scaffoldBackgroundColor: Colors.white,
             appBarTheme: const AppBarTheme(
-              backgroundColor: Colors.white,
+              backgroundColor: Color.fromARGB(255, 224, 238, 255),
               elevation: 0,
               iconTheme: IconThemeData(color: Colors.black),
               titleTextStyle: TextStyle(
@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
             primaryColor: const Color(0xFF1DA1F2),
             scaffoldBackgroundColor: Colors.black,
             appBarTheme: const AppBarTheme(
-              backgroundColor: Colors.black,
+              backgroundColor: Color.fromARGB(255, 13, 19, 58),
               elevation: 0,
               iconTheme: IconThemeData(color: Colors.white),
               titleTextStyle: TextStyle(

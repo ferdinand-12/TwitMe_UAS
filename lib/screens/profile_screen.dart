@@ -28,6 +28,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           SliverAppBar(
             expandedHeight: 200,
             pinned: true,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 fit: StackFit.expand,
@@ -49,144 +50,161 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ],
           ),
+
+          /// ============================
+          /// HEADER PROFILE (Avatar + button)
+          /// ============================
           SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Transform.translate(
-                  offset: const Offset(0, -40),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              width: 4,
-                            ),
-                          ),
-                          child: CircleAvatar(
-                            radius: 40,
-                            backgroundImage: user?.profileImage.isNotEmpty ?? false
-                                ? NetworkImage(user!.profileImage)
-                                : null,
-                            child: user?.profileImage.isEmpty ?? true
-                                ? const Icon(Icons.person, size: 40)
-                                : null,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 120,
-                          child: CustomButton(
-                            text: 'Edit Profil',
-                            onPressed: () {},
-                            isOutlined: true,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            child: Container(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 16), // jarak dari banner
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          Text(
-                            user?.displayName ?? '',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
+                      // Avatar
+                      Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                            width: 4,
                           ),
-                          if (user?.isVerified ?? false) ...[
-                            const SizedBox(width: 4),
-                            const Icon(
-                              Icons.verified,
-                              size: 20,
-                              color: Color(0xFF1DA1F2),
-                            ),
-                          ],
-                        ],
+                        ),
+                        child: CircleAvatar(
+                          radius: 40,
+                          backgroundImage: user?.profileImage.isNotEmpty ?? false
+                              ? NetworkImage(user!.profileImage)
+                              : null,
+                          child: user?.profileImage.isEmpty ?? true
+                              ? const Icon(Icons.person, size: 40)
+                              : null,
+                        ),
                       ),
-                      const SizedBox(height: 4),
+
+                      // Edit profile button
+                      SizedBox(
+                        width: 120,
+                        child: CustomButton(
+                          text: 'Edit Profil',
+                          onPressed: () {},
+                          isOutlined: true,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  /// ============================
+                  /// USER INFO
+                  /// ============================
+                  Row(
+                    children: [
                       Text(
-                        '@${user?.username ?? ''}',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 15,
+                        user?.displayName ?? '',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      if (user?.bio.isNotEmpty ?? false) ...[
-                        const SizedBox(height: 12),
-                        Text(user!.bio),
+                      if (user?.isVerified ?? false) ...[
+                        const SizedBox(width: 4),
+                        const Icon(
+                          Icons.verified,
+                          size: 20,
+                          color: Color(0xFF1DA1F2),
+                        ),
                       ],
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Bergabung ${_formatDate(user?.joinDate ?? DateTime.now())}',
-                            style: TextStyle(color: Colors.grey[600]),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Text(
-                            '${user?.following ?? 0}',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Mengikuti',
-                            style: TextStyle(color: Colors.grey[600]),
-                          ),
-                          const SizedBox(width: 20),
-                          Text(
-                            '${user?.followers ?? 0}',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Pengikut',
-                            style: TextStyle(color: Colors.grey[600]),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
                     ],
                   ),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? Colors.grey[800]!
-                            : Colors.grey[200]!,
-                      ),
+                  const SizedBox(height: 4),
+
+                  Text(
+                    '@${user?.username ?? ''}',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 15,
                     ),
                   ),
-                  child: Row(
+
+                  if (user?.bio.isNotEmpty ?? false) ...[
+                    const SizedBox(height: 12),
+                    Text(user!.bio),
+                  ],
+
+                  const SizedBox(height: 12),
+                  Row(
                     children: [
-                      _buildTab('Tweet', 0),
-                      _buildTab('Balasan', 1),
-                      _buildTab('Media', 2),
-                      _buildTab('Suka', 3),
+                      const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Bergabung ${_formatDate(user?.joinDate ?? DateTime.now())}',
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
                     ],
                   ),
-                ),
-              ],
+
+                  const SizedBox(height: 12),
+
+                  Row(
+                    children: [
+                      Text(
+                        '${user?.following ?? 0}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(width: 4),
+                      Text('Mengikuti', style: TextStyle(color: Colors.grey[600])),
+
+                      const SizedBox(width: 20),
+
+                      Text(
+                        '${user?.followers ?? 0}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(width: 4),
+                      Text('Pengikut', style: TextStyle(color: Colors.grey[600])),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+                ],
+              ),
             ),
           ),
+
+          /// ============================
+          /// TABS
+          /// ============================
+          SliverToBoxAdapter(
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey[800]!
+                        : Colors.grey[200]!,
+                  ),
+                ),
+              ),
+              child: Row(
+                children: [
+                  _buildTab('Tweet', 0),
+                  _buildTab('Balasan', 1),
+                  _buildTab('Media', 2),
+                  _buildTab('Suka', 3),
+                ],
+              ),
+            ),
+          ),
+
+          /// ============================
+          /// LIST TWEET USER
+          /// ============================
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
@@ -203,6 +221,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  /// BUILD TAB ITEM
   Widget _buildTab(String text, int index) {
     final isSelected = _selectedTab == index;
     return Expanded(
@@ -231,8 +250,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  /// FORMAT JOIN DATE
   String _formatDate(DateTime date) {
-    final months = [
+    const months = [
       'Januari',
       'Februari',
       'Maret',
@@ -249,6 +269,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return '${months[date.month - 1]} ${date.year}';
   }
 
+  /// SHOW MENU
   void _showProfileMenu(BuildContext context) {
     showModalBottomSheet(
       context: context,

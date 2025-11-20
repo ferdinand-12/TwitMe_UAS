@@ -41,17 +41,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     );
                   },
-                  child: CircleAvatar(
+                  child: const CircleAvatar(
                     backgroundImage: NetworkImage(
                       'https://i.pravatar.cc/150?img=1',
                     ),
                   ),
                 ),
               ),
-              title: const Icon(
-                Icons.flutter_dash,
-                color: Color(0xFF1DA1F2),
-                size: 30,
+
+              // ================================
+              // LOGO DIGANTI MENGGUNAKAN ASSET
+              // ================================
+              title: Image.asset(
+                'assets/icon/app_icon.png',
+                height: 32,
               ),
               centerTitle: true,
               actions: [
@@ -62,25 +65,34 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             )
           : null,
+
+      // ================================
+      // BODY
+      // ================================
       body: _screens[_selectedIndex],
+
+      // ================================
+      // BOTTOM NAVIGATION BAR
+      // ================================
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color.fromARGB(255, 224, 238, 255),
         currentIndex: _selectedIndex,
         onTap: (index) => setState(() => _selectedIndex = index),
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: const Color(0xFF1DA1F2),
-        unselectedItemColor: Colors.grey,
+
+        selectedItemColor: const Color.fromARGB(255, 112, 112, 112),
+        unselectedItemColor: const Color.fromARGB(179, 0, 0, 0),
+
         showSelectedLabels: false,
         showUnselectedLabels: false,
+
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
             activeIcon: Icon(Icons.home),
             label: 'Beranda',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Cari',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Cari'),
           BottomNavigationBarItem(
             icon: Icon(Icons.notifications_outlined),
             activeIcon: Icon(Icons.notifications),
@@ -93,6 +105,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+
+      // ================================
+      // FAB (Tombol Tweet)
+      // ================================
       floatingActionButton: _selectedIndex == 0
           ? FloatingActionButton(
               onPressed: () {
@@ -125,6 +141,9 @@ class _FeedScreenState extends State<_FeedScreen> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        // ================================
+        // TAB: Untuk Anda / Mengikuti
+        // ================================
         Container(
           decoration: BoxDecoration(
             border: Border(
@@ -196,6 +215,10 @@ class _FeedScreenState extends State<_FeedScreen> {
             ],
           ),
         ),
+
+        // ================================
+        // LIST TWEETS
+        // ================================
         Expanded(
           child: Consumer<TweetProvider>(
             builder: (context, tweetProvider, _) {
