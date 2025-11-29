@@ -26,18 +26,40 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   Future<void> _submit() async {
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Email dan password harus diisi')),
+      );
+      return;
+    }
+
+    if (!isLogin && _usernameController.text.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Username harus diisi')));
+      return;
+    }
+
     setState(() => isLoading = true);
     try {
+      String? error;
       if (isLogin) {
-        await context
-            .read<AuthProvider>()
-            .login(_emailController.text, _passwordController.text);
+        error = await context.read<AuthProvider>().login(
+          _emailController.text,
+          _passwordController.text,
+        );
       } else {
-        await context.read<AuthProvider>().register(
-              _emailController.text,
-              _passwordController.text,
-              _usernameController.text,
-            );
+        error = await context.read<AuthProvider>().register(
+          _emailController.text,
+          _passwordController.text,
+          _usernameController.text,
+        );
+      }
+
+      if (error != null && mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(error)));
       }
     } finally {
       if (mounted) setState(() => isLoading = false);

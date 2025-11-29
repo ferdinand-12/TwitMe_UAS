@@ -24,11 +24,13 @@ class _ComposeTweetScreenState extends State<ComposeTweetScreen> {
   Future<void> _postTweet() async {
     if (_controller.text.trim().isEmpty) return;
 
+    final user = context.read<AuthProvider>().currentUser;
+    if (user == null) return;
+
     setState(() => _isPosting = true);
-    await Future.delayed(const Duration(seconds: 1));
 
     if (mounted) {
-      context.read<TweetProvider>().addTweet(_controller.text, []);
+      await context.read<TweetProvider>().addTweet(_controller.text, user);
       Navigator.pop(context);
     }
   }
@@ -113,7 +115,10 @@ class _ComposeTweetScreenState extends State<ComposeTweetScreen> {
               onPressed: () {},
             ),
             IconButton(
-              icon: const Icon(Icons.gif_box_outlined, color: Color(0xFF1DA1F2)),
+              icon: const Icon(
+                Icons.gif_box_outlined,
+                color: Color(0xFF1DA1F2),
+              ),
               onPressed: () {},
             ),
             IconButton(
@@ -121,17 +126,24 @@ class _ComposeTweetScreenState extends State<ComposeTweetScreen> {
               onPressed: () {},
             ),
             IconButton(
-              icon: const Icon(Icons.emoji_emotions_outlined,
-                  color: Color(0xFF1DA1F2)),
+              icon: const Icon(
+                Icons.emoji_emotions_outlined,
+                color: Color(0xFF1DA1F2),
+              ),
               onPressed: () {},
             ),
             IconButton(
-              icon: const Icon(Icons.schedule_outlined, color: Color(0xFF1DA1F2)),
+              icon: const Icon(
+                Icons.schedule_outlined,
+                color: Color(0xFF1DA1F2),
+              ),
               onPressed: () {},
             ),
             IconButton(
-              icon: const Icon(Icons.location_on_outlined,
-                  color: Color(0xFF1DA1F2)),
+              icon: const Icon(
+                Icons.location_on_outlined,
+                color: Color(0xFF1DA1F2),
+              ),
               onPressed: () {},
             ),
           ],

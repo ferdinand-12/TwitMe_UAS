@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/tweet_provider.dart';
+import '../providers/auth_provider.dart';
+import '../providers/message_provider.dart';
 import '../widgets/tweet_card.dart';
 import 'search_screen.dart';
-import 'notifications_screen.dart';
 import 'messages_screen.dart';
 import 'profile_screen.dart';
 import 'compose_tweet_screen.dart';
@@ -21,9 +22,26 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _screens = [
     const _FeedScreen(),
     const SearchScreen(),
-    const NotificationsScreen(),
     const MessagesScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Load data when screen initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authProvider = context.read<AuthProvider>();
+      final tweetProvider = context.read<TweetProvider>();
+      final messageProvider = context.read<MessageProvider>();
+
+      if (authProvider.currentUser != null) {
+        final userId = int.parse(authProvider.currentUser!.id);
+        tweetProvider.loadTweets();
+        tweetProvider.loadLikedTweets(userId);
+        messageProvider.loadConversations(userId);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,10 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
               // ================================
               // LOGO DIGANTI MENGGUNAKAN ASSET
               // ================================
-              title: Image.asset(
-                'assets/icon/app_icon.png',
-                height: 32,
-              ),
+              title: Image.asset('assets/icon/app_icon.png', height: 32),
               centerTitle: true,
               actions: [
                 IconButton(
@@ -93,11 +108,6 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Beranda',
           ),
           BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Cari'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications_outlined),
-            activeIcon: Icon(Icons.notifications),
-            label: 'Notifikasi',
-          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.mail_outline),
             activeIcon: Icon(Icons.mail),

@@ -1,138 +1,184 @@
 import 'package:flutter/material.dart';
 import '../models/tweet_model.dart';
 import '../models/user_model.dart';
+import '../helpers/database_helper.dart';
 
 class TweetProvider with ChangeNotifier {
-  final List<TweetModel> _tweets = [];
-  final List<TweetModel> _bookmarks = [];
+  List<TweetModel> _tweets = [];
+  List<String> _likedTweetIds = [];
+  int? _currentUserId;
 
   List<TweetModel> get tweets => _tweets;
-  List<TweetModel> get bookmarks => _bookmarks;
+  List<TweetModel> get likedTweets =>
+      _tweets.where((t) => _likedTweetIds.contains(t.id)).toList();
 
-  TweetProvider() {
-    _loadMockTweets();
-  }
+  Future<void> loadTweets() async {
+    try {
+      final db = DatabaseHelper.instance;
+      final tweetsData = await db.getAllTweets();
 
-  void _loadMockTweets() {
-    final mockUsers = [
-      UserModel(
-        id: '1',
-        username: 'johndoe',
-        displayName: 'John Doe',
-        profileImage: 'https://i.pravatar.cc/150?img=12',
-        isVerified: true,
-        joinDate: DateTime(2019, 1, 1),
-      ),
-      UserModel(
-        id: '2',
-        username: 'janesmth',
-        displayName: 'Jane Smith',
-        profileImage: 'https://i.pravatar.cc/150?img=45',
-        joinDate: DateTime(2020, 6, 15),
-      ),
-      UserModel(
-        id: '3',
-        username: 'techguru',
-        displayName: 'Tech Guru',
-        profileImage: 'https://i.pravatar.cc/150?img=33',
-        isVerified: true,
-        joinDate: DateTime(2018, 3, 20),
-      ),
-    ];
+      _tweets = tweetsData.map((data) {
+        return TweetModel(
+          id: data['id'].toString(),
+          author: UserModel(
+            id: data['userId'].toString(),
+            username: data['username'],
+            displayName: data['displayName'],
+            profileImage: data['profileImage'] ?? '',
+            isVerified: data['isVerified'] == 1,
+            joinDate: DateTime.now(),
+          ),
+          content: data['content'],
+          images: data['images'] != null && data['images'].isNotEmpty
+              ? (data['images'] as String).split(',')
+              : [],
+          createdAt: DateTime.parse(data['createdAt']),
+          likes: data['likes'],
+          retweets: data['retweets'],
+          replies: data['replies'],
+        );
+      }).toList();
 
-    _tweets.addAll([
-      TweetModel(
-        id: '1',
-        author: mockUsers[0],
-        content: 'Excited to share my latest Flutter project! 🚀 Check it out and let me know what you think. #FlutterDev #MobileDev',
-        createdAt: DateTime.now().subtract(const Duration(hours: 2)),
-        likes: 245,
-        retweets: 48,
-        replies: 23,
-      ),
-      TweetModel(
-        id: '2',
-        author: mockUsers[1],
-        content: 'Just finished reading an amazing book on software architecture. Highly recommended for all developers! 📚',
-        createdAt: DateTime.now().subtract(const Duration(hours: 5)),
-        likes: 189,
-        retweets: 32,
-        replies: 15,
-      ),
-      TweetModel(
-        id: '3',
-        author: mockUsers[2],
-        content: 'The future of AI is incredible. Can\'t wait to see what 2025 brings! 🤖✨',
-        images: ['https://picsum.photos/600/400?random=1'],
-        createdAt: DateTime.now().subtract(const Duration(hours: 8)),
-        likes: 1523,
-        retweets: 342,
-        replies: 156,
-      ),
-      TweetModel(
-        id: '4',
-        author: mockUsers[0],
-        content: 'Coffee + Code = Perfect morning ☕️💻',
-        createdAt: DateTime.now().subtract(const Duration(days: 1)),
-        likes: 567,
-        retweets: 89,
-        replies: 45,
-      ),
-    ]);
-  }
-
-  void addTweet(String content, List<String> images) {
-    final newTweet = TweetModel(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      author: UserModel(
-        id: '1',
-        username: 'user123',
-        displayName: 'User Name',
-        profileImage: 'https://i.pravatar.cc/150?img=1',
-        isVerified: true,
-        joinDate: DateTime.now(),
-      ),
-      content: content,
-      images: images,
-      createdAt: DateTime.now(),
-    );
-    _tweets.insert(0, newTweet);
-    notifyListeners();
-  }
-
-  void toggleLike(String tweetId) {
-    final index = _tweets.indexWhere((t) => t.id == tweetId);
-    if (index != -1) {
-      _tweets[index].isLiked = !_tweets[index].isLiked;
-      _tweets[index].likes += _tweets[index].isLiked ? 1 : -1;
       notifyListeners();
+    } catch (e) {
+      print('Error loading tweets: $e');
     }
   }
 
-  void toggleRetweet(String tweetId) {
-    final index = _tweets.indexWhere((t) => t.id == tweetId);
-    if (index != -1) {
-      _tweets[index].isRetweeted = !_tweets[index].isRetweeted;
-      _tweets[index].retweets += _tweets[index].isRetweeted ? 1 : -1;
+  Future<void> loadLikedTweets(int userId) async {
+    try {
+      _currentUserId = userId;
+      final db = DatabaseHelper.instance;
+      final likedData = await db.getLikedTweetsByUserId(userId);
+
+      _likedTweetIds = likedData.map((data) => data['id'].toString()).toList();
       notifyListeners();
+    } catch (e) {
+      print('Error loading liked tweets: $e');
     }
   }
 
-  void toggleBookmark(String tweetId) {
-    final index = _tweets.indexWhere((t) => t.id == tweetId);
-    if (index != -1) {
-      _tweets[index].isBookmarked = !_tweets[index].isBookmarked;
-      if (_tweets[index].isBookmarked) {
-        _bookmarks.add(_tweets[index]);
+  Future<void> addTweet(
+    String content,
+    UserModel author, {
+    List<String>? images,
+  }) async {
+    try {
+      final db = DatabaseHelper.instance;
+      final userId = int.parse(author.id);
+
+      final tweetId = await db.createTweet({
+        'userId': userId,
+        'content': content,
+        'images': images?.join(',') ?? '',
+        'createdAt': DateTime.now().toIso8601String(),
+        'likes': 0,
+        'retweets': 0,
+        'replies': 0,
+      });
+
+      final newTweet = TweetModel(
+        id: tweetId.toString(),
+        author: author,
+        content: content,
+        images: images ?? [],
+        createdAt: DateTime.now(),
+        likes: 0,
+        retweets: 0,
+        replies: 0,
+      );
+
+      _tweets.insert(0, newTweet);
+      notifyListeners();
+    } catch (e) {
+      print('Error adding tweet: $e');
+    }
+  }
+
+  Future<void> toggleLike(String tweetId, int userId) async {
+    try {
+      final db = DatabaseHelper.instance;
+      final tweetIdInt = int.parse(tweetId);
+      final isLiked = await db.isTweetLiked(userId, tweetIdInt);
+
+      final tweetIndex = _tweets.indexWhere((t) => t.id == tweetId);
+      if (tweetIndex == -1) return;
+
+      final tweet = _tweets[tweetIndex];
+      int newLikes;
+
+      if (isLiked) {
+        await db.unlikeTweet(userId, tweetIdInt);
+        newLikes = tweet.likes - 1;
+        _likedTweetIds.remove(tweetId);
       } else {
-        _bookmarks.removeWhere((t) => t.id == tweetId);
+        await db.likeTweet(userId, tweetIdInt);
+        newLikes = tweet.likes + 1;
+        _likedTweetIds.add(tweetId);
       }
+
+      await db.updateTweetLikes(tweetIdInt, newLikes);
+
+      _tweets[tweetIndex] = TweetModel(
+        id: tweet.id,
+        author: tweet.author,
+        content: tweet.content,
+        images: tweet.images,
+        createdAt: tweet.createdAt,
+        likes: newLikes,
+        retweets: tweet.retweets,
+        replies: tweet.replies,
+      );
+
       notifyListeners();
+    } catch (e) {
+      print('Error toggling like: $e');
     }
   }
 
-  void deleteTweet(String tweetId) {
-    _tweets.removeWhere((t) => t.id == tweetId);
-    notifyListeners();
+  Future<void> toggleRetweet(String tweetId) async {
+    try {
+      final tweetIndex = _tweets.indexWhere((t) => t.id == tweetId);
+      if (tweetIndex == -1) return;
+
+      final tweet = _tweets[tweetIndex];
+      final newRetweets = tweet.retweets + 1;
+
+      final db = DatabaseHelper.instance;
+      await db.updateTweetRetweets(int.parse(tweetId), newRetweets);
+
+      _tweets[tweetIndex] = TweetModel(
+        id: tweet.id,
+        author: tweet.author,
+        content: tweet.content,
+        images: tweet.images,
+        createdAt: tweet.createdAt,
+        likes: tweet.likes,
+        retweets: newRetweets,
+        replies: tweet.replies,
+      );
+
+      notifyListeners();
+    } catch (e) {
+      print('Error toggling retweet: $e');
+    }
   }
+
+  Future<void> deleteTweet(String tweetId) async {
+    try {
+      final db = DatabaseHelper.instance;
+      await db.deleteTweet(int.parse(tweetId));
+
+      _tweets.removeWhere((t) => t.id == tweetId);
+      notifyListeners();
+    } catch (e) {
+      print('Error deleting tweet: $e');
+    }
+  }
+
+  bool isLiked(String tweetId) {
+    return _likedTweetIds.contains(tweetId);
+  }
+
+  void toggleBookmark(String id) {}
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/tweet_model.dart';
 import '../providers/tweet_provider.dart';
+import '../providers/auth_provider.dart';
 import '../screens/tweet_detail_screen.dart';
 import 'user_avatar.dart';
 
@@ -12,6 +13,9 @@ class TweetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.read<AuthProvider>();
+    final currentUser = authProvider.currentUser;
+
     return InkWell(
       onTap: () {
         Navigator.push(
@@ -111,17 +115,13 @@ class TweetCard extends StatelessWidget {
                         onTap: () {},
                       ),
                       _ActionButton(
-                        icon: tweet.isRetweeted
-                            ? Icons.repeat
-                            : Icons.repeat,
+                        icon: tweet.isRetweeted ? Icons.repeat : Icons.repeat,
                         count: tweet.retweets,
                         color: tweet.isRetweeted
                             ? Colors.green
                             : Colors.grey[600]!,
                         onTap: () {
-                          context
-                              .read<TweetProvider>()
-                              .toggleRetweet(tweet.id);
+                          context.read<TweetProvider>().toggleRetweet(tweet.id);
                         },
                       ),
                       _ActionButton(
@@ -131,7 +131,13 @@ class TweetCard extends StatelessWidget {
                         count: tweet.likes,
                         color: tweet.isLiked ? Colors.red : Colors.grey[600]!,
                         onTap: () {
-                          context.read<TweetProvider>().toggleLike(tweet.id);
+                          if (currentUser != null) {
+                            final userId = int.parse(currentUser.id);
+                            context.read<TweetProvider>().toggleLike(
+                              tweet.id,
+                              userId,
+                            );
+                          }
                         },
                       ),
                       _ActionButton(
@@ -148,12 +154,13 @@ class TweetCard extends StatelessWidget {
                               : Icons.bookmark_border,
                           size: 20,
                         ),
-                        color:
-                            tweet.isBookmarked ? Colors.blue : Colors.grey[600],
+                        color: tweet.isBookmarked
+                            ? Colors.blue
+                            : Colors.grey[600],
                         onPressed: () {
-                          context
-                              .read<TweetProvider>()
-                              .toggleBookmark(tweet.id);
+                          context.read<TweetProvider>().toggleBookmark(
+                            tweet.id,
+                          );
                         },
                       ),
                     ],

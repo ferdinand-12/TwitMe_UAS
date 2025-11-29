@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/user_avatar.dart';
+import 'message_detail_screen.dart';
 
 class MessagesScreen extends StatelessWidget {
   const MessagesScreen({Key? key}) : super(key: key);
@@ -48,10 +49,7 @@ class MessagesScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           final message = messages[index];
           return ListTile(
-            leading: UserAvatar(
-              imageUrl: message['image'] as String,
-              size: 48,
-            ),
+            leading: UserAvatar(imageUrl: message['image'] as String, size: 48),
             title: Row(
               children: [
                 Text(
@@ -61,10 +59,7 @@ class MessagesScreen extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text(
                   '@${message['username']} · ${message['time']}',
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
                 ),
               ],
             ),
@@ -72,8 +67,9 @@ class MessagesScreen extends StatelessWidget {
               message['message'] as String,
               style: TextStyle(
                 color: (message['unread'] as bool) ? null : Colors.grey[600],
-                fontWeight:
-                    (message['unread'] as bool) ? FontWeight.w500 : FontWeight.normal,
+                fontWeight: (message['unread'] as bool)
+                    ? FontWeight.w500
+                    : FontWeight.normal,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -88,7 +84,18 @@ class MessagesScreen extends StatelessWidget {
                     ),
                   )
                 : null,
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MessageDetailScreen(
+                    userName: message['name'] as String,
+                    username: message['username'] as String,
+                    userImage: message['image'] as String,
+                  ),
+                ),
+              );
+            },
           );
         },
       ),

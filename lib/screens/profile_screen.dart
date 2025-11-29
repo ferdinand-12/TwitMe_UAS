@@ -5,6 +5,7 @@ import '../providers/tweet_provider.dart';
 import '../providers/theme_provider.dart';
 import '../widgets/tweet_card.dart';
 import '../widgets/custom_button.dart';
+import 'edit_profile_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -34,10 +35,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 fit: StackFit.expand,
                 children: [
                   if (user?.coverImage.isNotEmpty ?? false)
-                    Image.network(
-                      user!.coverImage,
-                      fit: BoxFit.cover,
-                    )
+                    Image.network(user!.coverImage, fit: BoxFit.cover)
                   else
                     Container(color: Colors.grey[300]),
                 ],
@@ -77,7 +75,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         child: CircleAvatar(
                           radius: 40,
-                          backgroundImage: user?.profileImage.isNotEmpty ?? false
+                          backgroundImage:
+                              user?.profileImage.isNotEmpty ?? false
                               ? NetworkImage(user!.profileImage)
                               : null,
                           child: user?.profileImage.isEmpty ?? true
@@ -91,7 +90,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         width: 120,
                         child: CustomButton(
                           text: 'Edit Profil',
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const EditProfileScreen(),
+                              ),
+                            );
+                          },
                           isOutlined: true,
                         ),
                       ),
@@ -126,10 +132,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   Text(
                     '@${user?.username ?? ''}',
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 15,
-                    ),
+                    style: TextStyle(color: Colors.grey[600], fontSize: 15),
                   ),
 
                   if (user?.bio.isNotEmpty ?? false) ...[
@@ -140,7 +143,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
+                      const Icon(
+                        Icons.calendar_today,
+                        size: 16,
+                        color: Colors.grey,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         'Bergabung ${_formatDate(user?.joinDate ?? DateTime.now())}',
@@ -158,7 +165,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(width: 4),
-                      Text('Mengikuti', style: TextStyle(color: Colors.grey[600])),
+                      Text(
+                        'Mengikuti',
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
 
                       const SizedBox(width: 20),
 
@@ -167,7 +177,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(width: 4),
-                      Text('Pengikut', style: TextStyle(color: Colors.grey[600])),
+                      Text(
+                        'Pengikut',
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
                     ],
                   ),
 
@@ -206,15 +219,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           /// LIST TWEET USER
           /// ============================
           SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                if (_selectedTab == 0) {
-                  return TweetCard(tweet: userTweets[index]);
-                }
-                return const SizedBox();
-              },
-              childCount: _selectedTab == 0 ? userTweets.length : 0,
-            ),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              if (_selectedTab == 0) {
+                return TweetCard(tweet: userTweets[index]);
+              }
+              return const SizedBox();
+            }, childCount: _selectedTab == 0 ? userTweets.length : 0),
           ),
         ],
       ),
@@ -232,7 +242,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
-                color: isSelected ? const Color(0xFF1DA1F2) : Colors.transparent,
+                color: isSelected
+                    ? const Color(0xFF1DA1F2)
+                    : Colors.transparent,
                 width: 3,
               ),
             ),
@@ -264,7 +276,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       'September',
       'Oktober',
       'November',
-      'Desember'
+      'Desember',
     ];
     return '${months[date.month - 1]} ${date.year}';
   }

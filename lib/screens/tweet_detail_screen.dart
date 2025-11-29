@@ -114,7 +114,7 @@ class TweetDetailScreen extends StatelessWidget {
                       color: tweet.isLiked ? Colors.red : null,
                     ),
                     onPressed: () {
-                      context.read<TweetProvider>().toggleLike(tweet.id);
+                      context.read<TweetProvider>().toggleLike(tweet.id, tweet.isLiked ? 0 : 1);
                     },
                   ),
                   IconButton(

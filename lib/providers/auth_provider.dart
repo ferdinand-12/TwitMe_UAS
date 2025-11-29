@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/user_model.dart';
+import '../helpers/database_helper.dart';
 
 class AuthProvider with ChangeNotifier {
   UserModel? _currentUser;
@@ -8,38 +9,133 @@ class AuthProvider with ChangeNotifier {
   UserModel? get currentUser => _currentUser;
   bool get isAuthenticated => _isAuthenticated;
 
-  Future<void> login(String email, String password) async {
-    await Future.delayed(const Duration(seconds: 1));
-    _currentUser = UserModel(
-      id: '1',
-      username: 'user123',
-      displayName: 'User Name',
-      bio: 'Flutter Developer | Tech Enthusiast',
-      profileImage: 'https://i.pravatar.cc/150?img=1',
-      followers: 1234,
-      following: 567,
-      joinDate: DateTime(2020, 1, 1),
-      isVerified: true,
-    );
-    _isAuthenticated = true;
+  // Initialize and check if user is already logged in
+  Future<void> init() async {
+    // For now, we'll just set authenticated to false
+    // In a real app, you might store the user ID in shared preferences
+    _isAuthenticated = false;
     notifyListeners();
   }
 
-  Future<void> register(String email, String password, String username) async {
-    await Future.delayed(const Duration(seconds: 1));
-    _currentUser = UserModel(
-      id: '1',
-      username: username,
-      displayName: username,
-      joinDate: DateTime.now(),
-    );
-    _isAuthenticated = true;
-    notifyListeners();
+  Future<String?> login(String email, String password) async {
+    try {
+      final db = DatabaseHelper.instance;
+      final userMap = await db.getUserByEmail(email);
+
+      if (userMap == null) {
+        return 'Email tidak ditemukan';
+      }
+
+      if (userMap['password'] != password) {
+        return 'Password salah';
+      }
+
+      _currentUser = UserModel(
+        id: userMap['id'].toString(),
+        username: userMap['username'],
+        displayName: userMap['displayName'],
+        bio: userMap['bio'] ?? '',
+        profileImage: userMap['profileImage'] ?? '',
+        coverImage: userMap['coverImage'] ?? '',
+        followers: userMap['followers'],
+        following: userMap['following'],
+        joinDate: DateTime.parse(userMap['joinDate']),
+        isVerified: userMap['isVerified'] == 1,
+      );
+
+      _isAuthenticated = true;
+      notifyListeners();
+      return null; // Success
+    } catch (e) {
+      return 'Terjadi kesalahan: $e';
+    }
+  }
+
+  Future<String?> register(
+    String email,
+    String password,
+    String username,
+  ) async {
+    try {
+      final db = DatabaseHelper.instance;
+
+      // Check if email already exists
+      final existingUser = await db.getUserByEmail(email);
+      if (existingUser != null) {
+        return 'Email sudah terdaftar';
+      }
+
+      // Create new user
+      final userId = await db.createUser({
+        'username': username,
+        'email': email,
+        'password': password,
+        'displayName': username,
+        'bio': '',
+        'profileImage': '',
+        'coverImage': '',
+        'followers': 0,
+        'following': 0,
+        'joinDate': DateTime.now().toIso8601String(),
+        'isVerified': 0,
+      });
+
+      _currentUser = UserModel(
+        id: userId.toString(),
+        username: username,
+        displayName: username,
+        joinDate: DateTime.now(),
+      );
+
+      _isAuthenticated = true;
+      notifyListeners();
+      return null; // Success
+    } catch (e) {
+      return 'Terjadi kesalahan: $e';
+    }
   }
 
   void logout() {
     _currentUser = null;
     _isAuthenticated = false;
     notifyListeners();
+  }
+
+  Future<void> updateProfile({
+    String? displayName,
+    String? bio,
+    String? profileImage,
+    String? coverImage,
+  }) async {
+    if (_currentUser != null) {
+      try {
+        final db = DatabaseHelper.instance;
+        final userId = int.parse(_currentUser!.id);
+
+        await db.updateUser(userId, {
+          'displayName': displayName ?? _currentUser!.displayName,
+          'bio': bio ?? _currentUser!.bio,
+          'profileImage': profileImage ?? _currentUser!.profileImage,
+          'coverImage': coverImage ?? _currentUser!.coverImage,
+        });
+
+        _currentUser = UserModel(
+          id: _currentUser!.id,
+          username: _currentUser!.username,
+          displayName: displayName ?? _currentUser!.displayName,
+          bio: bio ?? _currentUser!.bio,
+          profileImage: profileImage ?? _currentUser!.profileImage,
+          coverImage: coverImage ?? _currentUser!.coverImage,
+          followers: _currentUser!.followers,
+          following: _currentUser!.following,
+          joinDate: _currentUser!.joinDate,
+          isVerified: _currentUser!.isVerified,
+        );
+
+        notifyListeners();
+      } catch (e) {
+        print('Error updating profile: $e');
+      }
+    }
   }
 }
