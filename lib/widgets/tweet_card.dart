@@ -193,7 +193,7 @@ class TweetCard extends StatelessWidget {
   }
 
   Widget _buildImage(String imagePath) {
-    // Check if it's a local file path
+
     if (imagePath.startsWith('/') ||
         imagePath.startsWith('file://') ||
         !imagePath.startsWith('http')) {
@@ -210,7 +210,7 @@ class TweetCard extends StatelessWidget {
         },
       );
     } else {
-      // Network image
+
       return Image.network(
         imagePath,
         fit: BoxFit.cover,

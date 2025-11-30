@@ -9,10 +9,7 @@ class AuthProvider with ChangeNotifier {
   UserModel? get currentUser => _currentUser;
   bool get isAuthenticated => _isAuthenticated;
 
-  // Initialize and check if user is already logged in
   Future<void> init() async {
-    // For now, we'll just set authenticated to false
-    // In a real app, you might store the user ID in shared preferences
     _isAuthenticated = false;
     notifyListeners();
   }
@@ -45,7 +42,7 @@ class AuthProvider with ChangeNotifier {
 
       _isAuthenticated = true;
       notifyListeners();
-      return null; // Success
+      return null; 
     } catch (e) {
       return 'Terjadi kesalahan: $e';
     }
@@ -59,13 +56,11 @@ class AuthProvider with ChangeNotifier {
     try {
       final db = DatabaseHelper.instance;
 
-      // Check if email already exists
       final existingUser = await db.getUserByEmail(email);
       if (existingUser != null) {
         return 'Email sudah terdaftar';
       }
 
-      // Create new user
       final userId = await db.createUser({
         'username': username,
         'email': email,
@@ -89,7 +84,7 @@ class AuthProvider with ChangeNotifier {
 
       _isAuthenticated = true;
       notifyListeners();
-      return null; // Success
+      return null; 
     } catch (e) {
       return 'Terjadi kesalahan: $e';
     }

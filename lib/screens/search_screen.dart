@@ -157,7 +157,6 @@ class _SearchScreenState extends State<SearchScreen> {
             print('Tapped trending: ${item['title']}');
             _searchController.text = item['title'];
             context.read<SearchProvider>().updateSearchQuery(item['title']);
-            // Force focus removal to hide keyboard if open
             FocusScope.of(context).unfocus();
           },
           trailing: IconButton(

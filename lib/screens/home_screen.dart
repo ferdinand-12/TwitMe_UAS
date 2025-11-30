@@ -30,7 +30,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Load data when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final authProvider = context.read<AuthProvider>();
       final tweetProvider = context.read<TweetProvider>();
@@ -38,7 +37,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (authProvider.currentUser != null) {
         final userId = int.parse(authProvider.currentUser!.id);
-        // Load liked tweets first (this will load retweets and then all tweets)
         await tweetProvider.loadLikedTweets(userId);
         messageProvider.loadConversations(userId);
       }
@@ -79,9 +77,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // ================================
-              // LOGO DIGANTI MENGGUNAKAN ASSET
-              // ================================
               title: Image.asset('assets/icon/app_icon.png', height: 32),
               centerTitle: true,
               actions: [
@@ -100,14 +95,9 @@ class _HomeScreenState extends State<HomeScreen> {
             )
           : null,
 
-      // ================================
-      // BODY
-      // ================================
+
       body: _screens[_selectedIndex],
 
-      // ================================
-      // BOTTOM NAVIGATION BAR
-      // ================================
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color.fromARGB(255, 224, 238, 255),
         currentIndex: _selectedIndex,
@@ -135,9 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
 
-      // ================================
-      // FAB (Tombol Tweet)
-      // ================================
+
       floatingActionButton: _selectedIndex == 0
           ? FloatingActionButton(
               onPressed: () {
@@ -168,9 +156,7 @@ class _FeedScreenState extends State<_FeedScreen> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // ================================
-        // HEADER: Untuk Anda
-        // ================================
+
         Container(
           decoration: BoxDecoration(
             border: Border(
@@ -196,9 +182,7 @@ class _FeedScreenState extends State<_FeedScreen> {
           ),
         ),
 
-        // ================================
-        // LIST TWEETS
-        // ================================
+
         Expanded(
           child: Consumer<TweetProvider>(
             builder: (context, tweetProvider, _) {

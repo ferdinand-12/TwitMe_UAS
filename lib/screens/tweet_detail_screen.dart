@@ -178,7 +178,6 @@ class _TweetDetailScreenState extends State<TweetDetailScreen> {
                             IconButton(
                               icon: const Icon(Icons.chat_bubble_outline),
                               onPressed: () {
-                                // Focus on comment input
                                 FocusScope.of(context).requestFocus();
                               },
                             ),
@@ -265,7 +264,6 @@ class _TweetDetailScreenState extends State<TweetDetailScreen> {
             ),
           ),
 
-          // Comment Input
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(

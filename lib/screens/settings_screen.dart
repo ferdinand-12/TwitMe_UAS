@@ -42,7 +42,7 @@ class SettingsScreen extends StatelessWidget {
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.pop(context); // Close dialog
+                        Navigator.pop(context); 
                         context.read<AuthProvider>().logout();
                         Navigator.of(
                           context,

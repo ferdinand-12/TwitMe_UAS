@@ -44,11 +44,9 @@ class MessageProvider with ChangeNotifier {
         'isRead': 0,
       });
 
-      // Update local cache
       final key = _getConversationKey(senderId, receiverId);
       _messages[key] = await db.getMessagesBetweenUsers(senderId, receiverId);
 
-      // Reload conversations to update last message
       await loadConversations(senderId);
 
       notifyListeners();

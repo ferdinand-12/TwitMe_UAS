@@ -18,7 +18,6 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDB(String filePath) async {
-    // Initialize FFI for Windows/Linux/macOS
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       sqfliteFfiInit();
       databaseFactory = databaseFactoryFfi;
@@ -37,7 +36,6 @@ class DatabaseHelper {
 
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
-      // Add comments table if it doesn't exist
       await db.execute('''
         CREATE TABLE IF NOT EXISTS comments (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -56,7 +54,6 @@ class DatabaseHelper {
       const textType = 'TEXT NOT NULL';
       const intType = 'INTEGER NOT NULL';
 
-      // Create liked_tweets table if not exists
       await db.execute('''
         CREATE TABLE IF NOT EXISTS liked_tweets (
           id $idType,
@@ -68,7 +65,6 @@ class DatabaseHelper {
         )
       ''');
 
-      // Create retweeted_tweets table if not exists
       await db.execute('''
         CREATE TABLE IF NOT EXISTS retweeted_tweets (
           id $idType,
@@ -81,7 +77,6 @@ class DatabaseHelper {
         )
       ''');
 
-      // Create messages table if not exists
       await db.execute('''
         CREATE TABLE IF NOT EXISTS messages (
           id $idType,
@@ -103,7 +98,6 @@ class DatabaseHelper {
     const intType = 'INTEGER NOT NULL';
     const textTypeNullable = 'TEXT';
 
-    // Users table
     await db.execute('''
       CREATE TABLE users (
         id $idType,
@@ -121,7 +115,6 @@ class DatabaseHelper {
       )
     ''');
 
-    // Tweets table
     await db.execute('''
       CREATE TABLE tweets (
         id $idType,
@@ -136,7 +129,6 @@ class DatabaseHelper {
       )
     ''');
 
-    // Liked tweets table
     await db.execute('''
       CREATE TABLE liked_tweets (
         id $idType,
@@ -148,7 +140,6 @@ class DatabaseHelper {
       )
     ''');
 
-    // Retweeted tweets table
     await db.execute('''
       CREATE TABLE retweeted_tweets (
         id $idType,
@@ -161,7 +152,6 @@ class DatabaseHelper {
       )
     ''');
 
-    // Messages table
     await db.execute('''
       CREATE TABLE messages (
         id $idType,
@@ -175,7 +165,6 @@ class DatabaseHelper {
       )
     ''');
 
-    // Comments table
     await db.execute('''
       CREATE TABLE comments (
         id $idType,
@@ -188,8 +177,6 @@ class DatabaseHelper {
       )
     ''');
   }
-
-  // ==================== USER OPERATIONS ====================
 
   Future<int> createUser(Map<String, dynamic> user) async {
     final db = await database;
@@ -232,8 +219,6 @@ class DatabaseHelper {
       orderBy: 'displayName ASC',
     );
   }
-
-  // ==================== TWEET OPERATIONS ====================
 
   Future<int> createTweet(Map<String, dynamic> tweet) async {
     final db = await database;
@@ -317,8 +302,6 @@ class DatabaseHelper {
     );
   }
 
-  // ==================== LIKED TWEETS OPERATIONS ====================
-
   Future<int> likeTweet(int userId, int tweetId) async {
     final db = await database;
     return await db.insert('liked_tweets', {
@@ -366,8 +349,6 @@ class DatabaseHelper {
       [userId],
     );
   }
-
-  // ==================== RETWEET OPERATIONS ====================
 
   Future<int> retweetTweet(int userId, int tweetId) async {
     final db = await database;
@@ -421,8 +402,6 @@ class DatabaseHelper {
     );
   }
 
-  // ==================== COMMENT OPERATIONS ====================
-
   Future<int> createComment(Map<String, dynamic> comment) async {
     final db = await database;
     return await db.insert('comments', comment);
@@ -465,8 +444,6 @@ class DatabaseHelper {
       [userId],
     );
   }
-
-  // ==================== MESSAGE OPERATIONS ====================
 
   Future<int> createMessage(Map<String, dynamic> message) async {
     final db = await database;
@@ -529,8 +506,6 @@ class DatabaseHelper {
       whereArgs: [senderId, receiverId],
     );
   }
-
-  // ==================== CLOSE DATABASE ====================
 
   Future close() async {
     final db = await database;

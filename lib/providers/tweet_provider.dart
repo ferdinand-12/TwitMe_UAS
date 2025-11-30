@@ -58,7 +58,6 @@ class TweetProvider with ChangeNotifier {
       final repliesData = await db.getRepliesByUserId(userId);
 
       _userReplies = repliesData.map((data) {
-        // print('Loaded reply from ${data['username']}, image: ${data['profileImage']}');
         return CommentModel(
           id: data['id'].toString(),
           tweetId: data['tweetId'].toString(),
@@ -107,7 +106,6 @@ class TweetProvider with ChangeNotifier {
       }
       _comments[tweetId]!.add(newComment);
 
-      // Update reply count on tweet
       final tweetIndex = _tweets.indexWhere((t) => t.id == tweetId);
       if (tweetIndex != -1) {
         final tweet = _tweets[tweetIndex];
@@ -135,12 +133,10 @@ class TweetProvider with ChangeNotifier {
     try {
       final db = DatabaseHelper.instance;
 
-      // Check if we need to seed initial data by checking if dummy user exists
       final dummyUserExists = await db.getUserById(999);
       if (dummyUserExists == null) {
         final dummyTweets = _generateDummyTweets();
 
-        // Create dummy users first
         for (var tweet in dummyTweets) {
           final userId = int.parse(tweet.author.id);
           final userExists = await db.getUserById(userId);
@@ -932,7 +928,6 @@ class TweetProvider with ChangeNotifier {
           .map((data) => data['id'].toString())
           .toList();
 
-      // Also store the full tweet models for display if needed
       _userRetweets = retweetedData.map((data) {
         return TweetModel(
           id: data['id'].toString(),

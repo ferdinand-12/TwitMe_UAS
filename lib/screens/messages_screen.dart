@@ -123,7 +123,6 @@ class MessagesScreen extends StatelessWidget {
               builder: (context) => const UserSelectionScreen(),
             ),
           );
-          // Refresh messages when returning
           if (context.mounted) {
             context.read<MessageProvider>().loadConversations(
               int.parse(user.id),
